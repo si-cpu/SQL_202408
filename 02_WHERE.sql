@@ -122,5 +122,14 @@ SELECT
 FROM employees
 ORDER BY hire_date DESC;
 
+---------------------------------------------------------
+-- FROM -> WHERE -> GROUPBY ->SELECT -> ODERBY 순으로 실행되기 떄문에
+-- 무조건 FROM부터 실행된다는 것을 이해하자 
+SELECT
+    first_name,
+    salary*12 AS pay
+FROM employees
+ORDER BY pay DESC
+
 
     
