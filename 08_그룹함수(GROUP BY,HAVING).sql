@@ -80,15 +80,34 @@ ORDER BY 평균급여 DESC;
 /*
 문제 1.
 1-1. 사원 테이블에서 JOB_ID별 사원 수를 구하세요.
+*/
+SELECT
+    JOB_ID,
+    COUNT(JOB_ID)
+FROM employees
+GROUP BY JOB_id
+ORDER BY JOB_ID DESC;
+
+/*
 1-2. 사원 테이블에서 JOB_ID별 월급의 평균을 구하세요. 월급의 평균 순으로 내림차순 정렬하세요.
 */
-
+SELECT
+    JOB_ID,
+    AVG(SALARY),
+    COUNT(JOB_ID)
+FROM employees
+GROUP BY JOB_id
+ORDER BY AVG(SALARY) DESC;
 
 /*
 문제 2.
 사원 테이블에서 입사 년도 별 사원 수를 구하세요.
 (TO_CHAR() 함수를 사용해서 연도만 변환합니다. 그리고 그것을 그룹화 합니다.)
 */
+SELECT
+    to_char(SYSDATE,YYYY) AS YEAR
+FROM employees
+GROUP BY ;
 
 
 /*
@@ -96,6 +115,9 @@ ORDER BY 평균급여 DESC;
 급여가 5000 이상인 사원들의 부서별 평균 급여를 출력하세요. 
 단 부서 평균 급여가 7000이상인 부서만 출력하세요.
 */
+SELECT
+
+FORM employees
 
 
 /*
