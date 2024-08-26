@@ -43,7 +43,7 @@ SELECT
 FROM employees 
 GROUP BY (department_id,job_id); 
 
----------------------------------------
+-----------------------------------
 -- 실행순서 FROM -> GROUP BY -> HAVING -> SELECT 순으로 진행됨을 알아야 한다.
 -- GROUP BY를 통해 그룹화 할때 조건을 지정할 경우 HAVING 절을 사용해야한다.
 --WHERE문으로 사용이 불가능한 이유는 WHERE은 일반 조건절로 GROUP BY보다 먼저 실행되기 때문이다.
@@ -76,25 +76,25 @@ HAVING AVG(salary) >= 5000
 ORDER BY 평균급여 DESC;
 
 
-
+--------------------------------------------------------------------------------
 /*
 문제 1.
 1-1. 사원 테이블에서 JOB_ID별 사원 수를 구하세요.
 */
 SELECT
     JOB_ID,
-    COUNT(JOB_ID)
+    COUNT(*) AS 사원수
 FROM employees
-GROUP BY JOB_id
-ORDER BY JOB_ID DESC;
+GROUP BY job_id
+ORDER BY job_id DESC;
 
 /*
 1-2. 사원 테이블에서 JOB_ID별 월급의 평균을 구하세요. 월급의 평균 순으로 내림차순 정렬하세요.
 */
 SELECT
     JOB_ID,
-    AVG(SALARY),
-    COUNT(JOB_ID)
+    AVG(SALARY)AS 평균월급,
+    COUNT(*) AS 사원수
 FROM employees
 GROUP BY JOB_id
 ORDER BY AVG(SALARY) DESC;
@@ -105,9 +105,11 @@ ORDER BY AVG(SALARY) DESC;
 (TO_CHAR() 함수를 사용해서 연도만 변환합니다. 그리고 그것을 그룹화 합니다.)
 */
 SELECT
-    to_char(SYSDATE,YYYY) AS YEAR
+    TO_CHAR(hire_date,'yy') AS 입사연도,
+    COUNT(*)AS 사원수
 FROM employees
-GROUP BY ;
+GROUP BY TO_CHAR(hire_date,'yy')
+ORDER BY 입사연도;
 
 
 /*
@@ -116,8 +118,12 @@ GROUP BY ;
 단 부서 평균 급여가 7000이상인 부서만 출력하세요.
 */
 SELECT
-
-FORM employees
+    department_id,
+    AVG(salary) AS 평균급여
+FROM employees
+WHERE salary >=5000
+GROUP BY department_id
+HAVING AVG(salary) >= 7000;
 
 
 /*
@@ -127,93 +133,11 @@ department_id(부서별) salary(월급)의 평균, 합계, count를 구합니다.
 조건 1) 월급의 평균은 커미션을 적용시킨 월급입니다.
 조건 2) 평균은 소수 2째 자리에서 절사 하세요.
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+SELECT
+    department_id,
+    TRUNC(AVG(salary + salary*commission_pct),2) AS avg_salary,
+    SUM (salary + salary*commission_pct)AS total,
+    Count(*)as count
+FROM employees
+WHERE commission_pct IS NOT NULL
+GROUP BY department_id;
