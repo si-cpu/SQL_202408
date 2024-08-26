@@ -81,21 +81,93 @@ WHERE EXISTS (SELECT 1 FROM job_history jh
 -- 스칼라 서브쿼리라고도 칭함.
 -- 스칼라 서브쿼리 : 실행 결과가 단일 값을 반환하는 서브쿼리. 주로 SELECT, WHERE절에서 사용됨.
 SELECT
+    e.first_name,
+    d.department_name
+FROM employees e
+LEFT JOIN departments d
+ON e.department_id = d.department_id
+ORDER BY e.first_name;
 
-FROM
+---------------------------------------------------
+
+SELECT
+    e.first_name,
+    (
+        SELECT
+            d.department_name
+        FROM departments d
+        WHERE d.department_id = e.department_id
+    )AS department_name
+FROM employees e
+ORDER BY e.first_name;
+
+/*
+# 스칼라 서브쿼리 vs LEFT JOIN
+a. 간단한 상황에서 사용하면 쿼리가 직관적이고 간결합니다. 
+b. 단일 값을 반환하는 서브커리에서 유용.
+c. 대량데이터가 아닌 경우나, 서브쿼리의복잡도가 낮은 경우 적합
+
+1. 대량 데이터를 처리하거나, 여러 컬럼을 붙여야 할 때 유리합니다.
+2. 여러 테이블을 한 번에 조인해야 할 경우.
+3. 다중값 처리 및 중복 데이터 있는 경우 성능상 좀 더 유리.
+*/
+--------------------------------------------------------------------------------
+--각 부서별 사원수 뽑기(부서명, 사원수)
+SELECT
+    d.department_name,
+    COUNT(*) AS 사원수
+FROM departments d
+LEFT JOIN employees e
+ON e.department_id = d.department_id
+GROUP BY d.department_name, d.department_id
+ORDER BY 사원수 DESC;
 
 
+SELECT
+    d.department_name,
+    NVL((SELECT COUNT(*)
+    FROM employees e
+    WHERE e.department_id = d.department_id
+    GROUP BY department_id),0)AS 사원수
+FROM departments d ;
+SELECT * FROM departments;
 
+--------------------------------------------------------------------------------
+-- FROM 절 서브쿼리 (인라인 뷰)
+-- 특정 테이블 전체가 아닌 SELECT를 통해 일부 데이터를 조회한 것을
+-- 가상 테이블로 사용하고 싶을떄.
+-- 순번을 정해놓은 조회자료를 범위를 지정해서 가지고 오는 경우.
+SELECT *
+FROM(
+    SELECT
+        ROWNUM AS rn, tbl.*
+    FROM
+        (
+        SELECT 
+            employee_id,first_name,salary 
+        FROM employees
+        ORDER BY salary DESC
+        ) tbl
+    )
+WHERE rn > 10 AND 20 >= rn ;
 
+/*
+가장 안쪽 SELECT 절에서 필요한 테이블 형식(인라인 뷰)을 생성.
+바깥쪽 SELECT 절에서 ROWNUM을 붙여서 다시 조회
+가장 바깥쪽 SELECT 절에서는 이미 붙어있는 ROWNUM의 범위를 지정해서 조회.
 
-
-
-
-
-
-
-
-
-
-
-
+** SQL의 실행 순서
+FROM -> WHERE -> GROUP BY -> HAVING -> SELECT -> ORDER BY
+*/
+--------------------------------------------------------------------------------
+SELECT
+    e.employee_id, e.salary,
+    tbl.average_salary,
+    tbl.department_id
+FROM employees e JOIN 
+(SELECT
+    department_id,
+    TRUNC(AVG(salary),0) AS average_salary
+FROM employees
+GROUP BY department_id)tbl
+ON e.department_id = tbl.department_id;
