@@ -27,26 +27,66 @@ CREATE TABLE dept2(
     loca NUMBER(4),
     dept_bonus NUMBER(10),
     dept_gender VARCHAR2(1),
-    
+ ------------------------------------------------   
     CONSTRAINT dept2_deptno_pk PRIMARY KEY(dept_no), 
     CONSTRAINT dept2_deptname_uk UNIQUE(dept_name),
     CONSTRAINT dept2_loca_locid_fk FOREIGN KEY(loca) REFERENCES locations(location_id),
     CONSTRAINT dept2_bonus_ck CHECK(dept_bonus > 10000),
     CONSTRAINT dept2_gender_ck CHECK(dept_gender IN('M', 'F'))
 );
+--------------------------------------------------------------------------------
+DROP TABLE dept2;
+--------------------------------------------------------------------------------
+-- 외래키(foreign Key)가 부모테이블(참조테이블)에 없다면 INSERT가 불가능.
+INSERT INTO dept2
+VALUES (10, 'gg' , 6542, 90000, 'M'); -- 에러 6542 지역은 없음,
+------------------------------------------------
+INSERT INTO dept2
+VALUES (20, 'hh' , 1900, 90000, 'F');
+------------------------------------------------
+SELECT * FROM dept2;
 
 --------------------------------------------------------------------------------
+UPDATE dept2
+SET loca = 4000
+WHERE dept_no=10; -- 실패 (외래키 제약조건 위반)
+------------------------------------------------
+UPDATE dept2
+SET dept_no = 20
+WHERE dept_no = 10; -- 실패 (PK 제약조건 위반)
+------------------------------------------------
+UPDATE dept2
+SET dept_bonus = 900
+WHERE dept_no = 10; -- 실패 (외래키 제약조건 위반)
+--------------------------------------------------------------------------------
+-- 테이블 생성 이후 제약조건 추가 및 변경, 삭제 
+-- 제약조건은 추가, 삭제만 가능합니다. 변경은 불가합니다.
+-- 변경하려면 삭제하고 새로운 내용을 추가하면 됩니다.
 
+CREATE TABLE dept2(
+    dept_no NUMBER(2),
+    dept_name VARCHAR2(14) NOT NULL,
+    loca NUMBER(4),
+    dept_bonus NUMBER(10),
+    dept_gender VARCHAR2(1)
+    );
+-- pk 추가 
+ALTER TABLE dept2
+ADD CONSTRAINT dept2_deptno_pk PRIMARY KEY(dept_no), 
+-- UNIQUE 추가 
+ALTER TABLE dept2
+ADD CONSTRAINT dept2_deptname_uk UNIQUE(dept_name),
+-- FK 추가 
+ALTER TABLE dept2
+ADD CONSTRAINT dept2_loca_locid_fk FOREIGN KEY(loca) REFERENCES locations(location_id),
+-- CHECK 추가 
+ALTER TABLE dept2
+ADD CONSTRAINT dept2_bonus_ck CHECK(dept_bonus > 10000),
+ADD CONSTRAINT dept2_gender_ck CHECK(dept_gender IN('M', 'F'))
 
-
-
-
-
-
-
-
-
-
+--NOT NULL은 열 수정 형태로 변경합니다. 특이케이스임.
+ALTER TABLE dept2
+MODIFY dept_bonus NUMBER(10) NOT NULL;
 
 
 
