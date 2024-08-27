@@ -89,6 +89,13 @@ ALTER TABLE dept2
 MODIFY dept_bonus NUMBER(10) NOT NULL;
 
 
+--제약 조건 확인
+SELECT *FROM user_constraints
+WHERE table_name = 'DEPT2';
+
+--제약조건 삭제(제약조건의 이름으로 -> 이름을 직접 짓지 않았다면 오라클이 부여한 이름제시)
+ALTER TABLE dept2 DROP CONSTRAINT dept2_bonous_ck;
+
 
 
 
